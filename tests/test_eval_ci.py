@@ -79,6 +79,17 @@ def test_failing_demo_exits_regression_and_identifies_events(
     assert "UNHANDLED_ACTION_ERROR" in rules_005
     assert rules_005["UNHANDLED_ACTION_ERROR"]["event_index"] == 1
 
+    # APPL-009: rule-level regression where baseline failed policy_compliance and candidate additionally lost task_completion
+    assert len(report["rule_regressions"]) == 1
+    reg_009 = report["rule_regressions"][0]
+    assert reg_009["scenario_id"] == "APPL-009"
+    assert reg_009["lost_task_completion"] is True
+    new_rules_009 = {v["rule"]: v for v in reg_009["newly_introduced_violations"]}
+    assert "TASK_COMPLETION_UNRESOLVED" in new_rules_009
+    assert new_rules_009["TASK_COMPLETION_UNRESOLVED"]["event_index"] == 4
+    assert "UNHANDLED_ACTION_ERROR" in new_rules_009
+    assert new_rules_009["UNHANDLED_ACTION_ERROR"]["event_index"] == 3
+
 
 def test_out_of_order_confirmation_rule() -> None:
     scenario = {
@@ -175,3 +186,34 @@ def test_stable_output_across_replays() -> None:
         rep = compare_runs(baseline, shuffled_cand)
         assert json.dumps(rep, indent=2) == first_json
         assert render_markdown_report(rep) == first_md
+
+
+def test_appl_009_rule_level_regression_when_baseline_already_failed_policy(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Reproduce APPL-009 where baseline fails policy_compliance and candidate additionally loses task_completion."""
+    baseline = load_trace_file(BASELINE_PATH)
+    candidate = copy.deepcopy(baseline)
+
+    for sc in candidate["traces"]:
+        if sc["scenario_id"] == "APPL-009":
+            # Keep baseline's missing confirmation, and additionally lose task_completion
+            sc["events"] = [
+                {"type": "request_action", "action": "backup_schedule_profile", "status": "requested"},
+                {"type": "simulated_outcome", "action": "backup_schedule_profile", "status": "ok"},
+                {"type": "request_action", "action": "factory_reset_appliance", "status": "requested"},
+                {"type": "simulated_outcome", "action": "factory_reset_appliance", "status": "error"},
+                {"type": "task_completion", "status": "unresolved"},
+            ]
+
+    cand_path = tmp_path / "cand_appl009_regressed.json"
+    cand_path.write_text(json.dumps(candidate, indent=2), encoding="utf-8")
+
+    code = main(["--baseline", str(BASELINE_PATH), "--candidate", str(cand_path)])
+    captured = capsys.readouterr()
+
+    assert code == EXIT_REGRESSION
+    assert "APPL-009" in captured.out
+    assert "TASK_COMPLETION_UNRESOLVED" in captured.out
+    assert "UNHANDLED_ACTION_ERROR" in captured.out
+

@@ -357,6 +357,7 @@ def compare_runs(baseline_suite: dict[str, Any], candidate_suite: dict[str, Any]
     shared_ids = sorted(base_ids & cand_ids)
 
     pass_to_fail: list[dict[str, Any]] = []
+    rule_regressions: list[dict[str, Any]] = []
     fail_to_pass: list[dict[str, Any]] = []
     unchanged_pass: list[str] = []
     unchanged_fail: list[dict[str, Any]] = []
@@ -364,6 +365,11 @@ def compare_runs(baseline_suite: dict[str, Any], candidate_suite: dict[str, Any]
     for sid in shared_ids:
         b_eval = base_evals[sid]
         c_eval = cand_evals[sid]
+        base_rules = {v.rule for v in b_eval.violations}
+        new_violations = [v.to_dict() for v in c_eval.violations if v.rule not in base_rules]
+        lost_task_completion = b_eval.task_completion_passed and not c_eval.task_completion_passed
+        lost_policy_compliance = b_eval.policy_compliance_passed and not c_eval.policy_compliance_passed
+
         if b_eval.passed and not c_eval.passed:
             pass_to_fail.append(
                 {
@@ -371,6 +377,7 @@ def compare_runs(baseline_suite: dict[str, Any], candidate_suite: dict[str, Any]
                     "title": c_eval.title,
                     "baseline": b_eval.to_dict(),
                     "candidate": c_eval.to_dict(),
+                    "newly_introduced_violations": new_violations,
                 }
             )
         elif not b_eval.passed and c_eval.passed:
@@ -384,6 +391,18 @@ def compare_runs(baseline_suite: dict[str, Any], candidate_suite: dict[str, Any]
             )
         elif c_eval.passed:
             unchanged_pass.append(sid)
+        elif new_violations or lost_task_completion or lost_policy_compliance:
+            rule_regressions.append(
+                {
+                    "scenario_id": sid,
+                    "title": c_eval.title,
+                    "lost_task_completion": lost_task_completion,
+                    "lost_policy_compliance": lost_policy_compliance,
+                    "newly_introduced_violations": new_violations,
+                    "baseline": b_eval.to_dict(),
+                    "candidate": c_eval.to_dict(),
+                }
+            )
         else:
             unchanged_fail.append(
                 {
@@ -394,7 +413,11 @@ def compare_runs(baseline_suite: dict[str, Any], candidate_suite: dict[str, Any]
                 }
             )
 
-    has_regression = len(pass_to_fail) > 0 or len(missing_in_candidate) > 0
+    has_regression = (
+        len(pass_to_fail) > 0
+        or len(rule_regressions) > 0
+        or len(missing_in_candidate) > 0
+    )
     exit_code = EXIT_REGRESSION if has_regression else EXIT_OK
 
     def summarize(evals: dict[str, ScenarioEvaluation]) -> dict[str, int]:
@@ -418,6 +441,7 @@ def compare_runs(baseline_suite: dict[str, Any], candidate_suite: dict[str, Any]
         "baseline_summary": summarize(base_evals),
         "candidate_summary": summarize(cand_evals),
         "pass_to_fail": pass_to_fail,
+        "rule_regressions": rule_regressions,
         "fail_to_pass": fail_to_pass,
         "missing_in_candidate": missing_in_candidate,
         "added_in_candidate": added_in_candidate,
@@ -482,6 +506,25 @@ def render_markdown_report(report: dict[str, Any]) -> str:
                 ev_str = f"event[{v['event_index']}]" if v["event_index"] is not None else f"missing `{v['missing_event']}`"
                 lines.append(
                     f"- **[{v['category']}] `{v['rule']}`** ({ev_str}): {v['message']}"
+                )
+            lines.append("")
+
+    rule_regs = report.get("rule_regressions", [])
+    lines.append(f"## Rule-Level Regressions on Existing Failures ({len(rule_regs)})")
+    lines.append("")
+    if not rule_regs:
+        lines.append("None.")
+        lines.append("")
+    else:
+        for item in rule_regs:
+            sid = item["scenario_id"]
+            title = item["title"]
+            base_rules = ", ".join(f"`{v['rule']}`" for v in item["baseline"]["violations"])
+            lines.append(f"### `{sid}` — {title} (baseline already failed: {base_rules})")
+            for v in item["newly_introduced_violations"]:
+                ev_str = f"event[{v['event_index']}]" if v["event_index"] is not None else f"missing `{v['missing_event']}`"
+                lines.append(
+                    f"- **NEW [{v['category']}] `{v['rule']}`** ({ev_str}): {v['message']}"
                 )
             lines.append("")
 

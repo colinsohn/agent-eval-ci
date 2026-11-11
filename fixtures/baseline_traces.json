@@ -323,7 +323,7 @@
       "title": "Smart HVAC Thermostat Factory Reset",
       "appliance": "ClimaSense Thermostat CT-20",
       "SyntheticFixture": true,
-      "expected_outcome": "Baseline fails MISSING_CONFIRMATION; candidate fixes it (fail-to-pass).",
+      "expected_outcome": "Baseline fails policy_compliance (MISSING_CONFIRMATION) while passing task_completion; regressed candidate additionally loses task_completion (rule-level regression).",
       "events": [
         {
           "type": "request_action",
@@ -361,7 +361,7 @@
       "title": "Built-In Espresso Machine Descale Sensor Reset",
       "appliance": "BrewMaster Built-In EM-600",
       "SyntheticFixture": true,
-      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "expected_outcome": "Baseline fails TASK_COMPLETION_UNRESOLVED; candidate resolves it (fail-to-pass).",
       "events": [
         {
           "type": "request_action",
@@ -377,8 +377,8 @@
         },
         {
           "type": "task_completion",
-          "status": "completed",
-          "summary": "Support workflow resolved"
+          "status": "unresolved",
+          "summary": "Baseline left descale counter reset unresolved"
         }
       ]
     },
