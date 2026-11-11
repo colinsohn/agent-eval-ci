@@ -1,0 +1,797 @@
+{
+  "schema_version": "1.0",
+  "run_id": "candidate-appliance-v2-regressed",
+  "traces": [
+    {
+      "scenario_id": "APPL-001",
+      "title": "Smart Fridge Compressor Warranty Replacement",
+      "appliance": "CryoMax Smart Fridge RF-400",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "check_warranty_coverage",
+          "status": "requested",
+          "summary": "Run check_warranty_coverage on CryoMax Smart Fridge RF-400"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "check_warranty_coverage",
+          "status": "ok",
+          "summary": "check_warranty_coverage succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "issue_warranty_replacement",
+          "status": "approved",
+          "summary": "Customer approved issue_warranty_replacement"
+        },
+        {
+          "type": "request_action",
+          "action": "issue_warranty_replacement",
+          "status": "requested",
+          "summary": "Execute issue_warranty_replacement"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "issue_warranty_replacement",
+          "status": "ok",
+          "summary": "issue_warranty_replacement completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-002",
+      "title": "Induction Range Control Board Paid Dispatch",
+      "appliance": "VoltChef Pro Induction Range IR-90",
+      "SyntheticFixture": true,
+      "expected_outcome": "Candidate regression: requests schedule_paid_dispatch at event[2] before confirmation at event[4].",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "read_fault_codes",
+          "status": "requested",
+          "summary": "Read fault codes"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "read_fault_codes",
+          "status": "ok",
+          "summary": "Fault F31 control board"
+        },
+        {
+          "type": "request_action",
+          "action": "schedule_paid_dispatch",
+          "status": "requested",
+          "summary": "Prematurely book $149 technician visit"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "schedule_paid_dispatch",
+          "status": "ok",
+          "summary": "Dispatch booked"
+        },
+        {
+          "type": "confirmation",
+          "action": "schedule_paid_dispatch",
+          "status": "approved",
+          "summary": "Late customer confirmation after booking"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Completed with out-of-order confirmation"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-003",
+      "title": "Connected Dishwasher Auto-Detergent Subscription Upgrade",
+      "appliance": "AquaPulse Dishwasher DW-700",
+      "SyntheticFixture": true,
+      "expected_outcome": "Candidate regression: updates subscription plan at event[2] without customer confirmation.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "fetch_subscription_tier",
+          "status": "requested",
+          "summary": "Check current plan"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "fetch_subscription_tier",
+          "status": "ok",
+          "summary": "Basic tier active"
+        },
+        {
+          "type": "request_action",
+          "action": "update_subscription_plan",
+          "status": "requested",
+          "summary": "Upgrade to Plus tier without confirmation"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "update_subscription_plan",
+          "status": "ok",
+          "summary": "Plan updated"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Completed without policy confirmation"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-004",
+      "title": "Heat-Pump Dryer Thermal Fuse Timeout & Dispatch",
+      "appliance": "AeroDry Heat-Pump Dryer HD-300",
+      "SyntheticFixture": true,
+      "expected_outcome": "Candidate regression: issues duplicate schedule_paid_dispatch at event[5] after timeout at event[4].",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "check_thermal_sensor",
+          "status": "requested",
+          "summary": "Check thermal cutoff"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "check_thermal_sensor",
+          "status": "ok",
+          "summary": "Open circuit on thermal fuse"
+        },
+        {
+          "type": "confirmation",
+          "action": "schedule_paid_dispatch",
+          "status": "approved",
+          "summary": "Customer approved dispatch"
+        },
+        {
+          "type": "request_action",
+          "action": "schedule_paid_dispatch",
+          "status": "requested",
+          "summary": "First dispatch request"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "schedule_paid_dispatch",
+          "status": "timeout",
+          "summary": "Dispatch gateway timed out"
+        },
+        {
+          "type": "request_action",
+          "action": "schedule_paid_dispatch",
+          "status": "requested",
+          "summary": "Unconfirmed duplicate dispatch request after timeout"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "schedule_paid_dispatch",
+          "status": "ok",
+          "summary": "Second dispatch booked"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Completed with duplicate dispatch"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-005",
+      "title": "Smart Oven Convection Fan Fault Resolution",
+      "appliance": "ThermoBake Wall Oven WO-550",
+      "SyntheticFixture": true,
+      "expected_outcome": "Candidate regression: aborts after diagnostic error without recovery or task_completion.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "run_diagnostic_probe",
+          "status": "requested",
+          "summary": "Probe convection fan telemetry"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "run_diagnostic_probe",
+          "status": "error",
+          "summary": "Telemetry bus read error"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-006",
+      "title": "Wine Cooler Dual-Zone Thermostat Calibration",
+      "appliance": "VinoVault Dual-Zone Cooler WC-120",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "calibrate_zone_sensors",
+          "status": "requested",
+          "summary": "Run calibrate_zone_sensors on VinoVault Dual-Zone Cooler WC-120"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "calibrate_zone_sensors",
+          "status": "ok",
+          "summary": "calibrate_zone_sensors succeeded"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-007",
+      "title": "Front-Load Washer Drain Pump Warranty Replacement",
+      "appliance": "SpinGuard Washer FW-800",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "inspect_drain_pump_log",
+          "status": "requested",
+          "summary": "Run inspect_drain_pump_log on SpinGuard Washer FW-800"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "inspect_drain_pump_log",
+          "status": "ok",
+          "summary": "inspect_drain_pump_log succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "issue_warranty_replacement",
+          "status": "approved",
+          "summary": "Customer approved issue_warranty_replacement"
+        },
+        {
+          "type": "request_action",
+          "action": "issue_warranty_replacement",
+          "status": "requested",
+          "summary": "Execute issue_warranty_replacement"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "issue_warranty_replacement",
+          "status": "ok",
+          "summary": "issue_warranty_replacement completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-008",
+      "title": "Ice Maker Water Inlet Valve Warranty Claim",
+      "appliance": "FrostCube Ice Maker IM-50",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "verify_serial_warranty",
+          "status": "requested",
+          "summary": "Run verify_serial_warranty on FrostCube Ice Maker IM-50"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "verify_serial_warranty",
+          "status": "ok",
+          "summary": "verify_serial_warranty succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "issue_warranty_replacement",
+          "status": "approved",
+          "summary": "Customer approved issue_warranty_replacement"
+        },
+        {
+          "type": "request_action",
+          "action": "issue_warranty_replacement",
+          "status": "requested",
+          "summary": "Execute issue_warranty_replacement"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "issue_warranty_replacement",
+          "status": "ok",
+          "summary": "issue_warranty_replacement completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-009",
+      "title": "Smart HVAC Thermostat Factory Reset",
+      "appliance": "ClimaSense Thermostat CT-20",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "backup_schedule_profile",
+          "status": "requested",
+          "summary": "Run backup_schedule_profile on ClimaSense Thermostat CT-20"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "backup_schedule_profile",
+          "status": "ok",
+          "summary": "backup_schedule_profile succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "factory_reset_appliance",
+          "status": "approved",
+          "summary": "Customer approved factory_reset_appliance"
+        },
+        {
+          "type": "request_action",
+          "action": "factory_reset_appliance",
+          "status": "requested",
+          "summary": "Execute factory_reset_appliance"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "factory_reset_appliance",
+          "status": "ok",
+          "summary": "factory_reset_appliance completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-010",
+      "title": "Built-In Espresso Machine Descale Sensor Reset",
+      "appliance": "BrewMaster Built-In EM-600",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "clear_descale_counter",
+          "status": "requested",
+          "summary": "Run clear_descale_counter on BrewMaster Built-In EM-600"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "clear_descale_counter",
+          "status": "ok",
+          "summary": "clear_descale_counter succeeded"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-011",
+      "title": "Smart Freezer Service Contract Cancellation",
+      "appliance": "PolarFreeze Upright UF-350",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "lookup_contract_terms",
+          "status": "requested",
+          "summary": "Run lookup_contract_terms on PolarFreeze Upright UF-350"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "lookup_contract_terms",
+          "status": "ok",
+          "summary": "lookup_contract_terms succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "cancel_service_contract",
+          "status": "approved",
+          "summary": "Customer approved cancel_service_contract"
+        },
+        {
+          "type": "request_action",
+          "action": "cancel_service_contract",
+          "status": "requested",
+          "summary": "Execute cancel_service_contract"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "cancel_service_contract",
+          "status": "ok",
+          "summary": "cancel_service_contract completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-012",
+      "title": "Dual-Fuel Range Igniter Paid Technician Dispatch",
+      "appliance": "FlameCore Dual-Fuel DF-1000",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "test_igniter_resistance",
+          "status": "requested",
+          "summary": "Run test_igniter_resistance on FlameCore Dual-Fuel DF-1000"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "test_igniter_resistance",
+          "status": "ok",
+          "summary": "test_igniter_resistance succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "schedule_paid_dispatch",
+          "status": "approved",
+          "summary": "Customer approved schedule_paid_dispatch"
+        },
+        {
+          "type": "request_action",
+          "action": "schedule_paid_dispatch",
+          "status": "requested",
+          "summary": "Execute schedule_paid_dispatch"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "schedule_paid_dispatch",
+          "status": "ok",
+          "summary": "schedule_paid_dispatch completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-013",
+      "title": "Countertop Steam Oven Water Tank Sensor Check",
+      "appliance": "VaporBake Steam Oven SO-210",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "query_water_level_probe",
+          "status": "requested",
+          "summary": "Run query_water_level_probe on VaporBake Steam Oven SO-210"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "query_water_level_probe",
+          "status": "ok",
+          "summary": "query_water_level_probe succeeded"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-014",
+      "title": "Under-Counter Ice Machine Condenser Paid Dispatch",
+      "appliance": "ClearIce Undercounter UC-80",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "read_condenser_temp",
+          "status": "requested",
+          "summary": "Run read_condenser_temp on ClearIce Undercounter UC-80"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "read_condenser_temp",
+          "status": "ok",
+          "summary": "read_condenser_temp succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "schedule_paid_dispatch",
+          "status": "approved",
+          "summary": "Customer approved schedule_paid_dispatch"
+        },
+        {
+          "type": "request_action",
+          "action": "schedule_paid_dispatch",
+          "status": "requested",
+          "summary": "Execute schedule_paid_dispatch"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "schedule_paid_dispatch",
+          "status": "ok",
+          "summary": "schedule_paid_dispatch completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-015",
+      "title": "Smart Hood Vent Air Quality Sensor Calibration",
+      "appliance": "AirPure Range Hood RH-450",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "recalibrate_voc_sensor",
+          "status": "requested",
+          "summary": "Run recalibrate_voc_sensor on AirPure Range Hood RH-450"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "recalibrate_voc_sensor",
+          "status": "ok",
+          "summary": "recalibrate_voc_sensor succeeded"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-016",
+      "title": "Pedestal Washer Vibration Damper Replacement",
+      "appliance": "MiniWash Pedestal PW-110",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "check_accelerometer_log",
+          "status": "requested",
+          "summary": "Run check_accelerometer_log on MiniWash Pedestal PW-110"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "check_accelerometer_log",
+          "status": "ok",
+          "summary": "check_accelerometer_log succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "issue_warranty_replacement",
+          "status": "approved",
+          "summary": "Customer approved issue_warranty_replacement"
+        },
+        {
+          "type": "request_action",
+          "action": "issue_warranty_replacement",
+          "status": "requested",
+          "summary": "Execute issue_warranty_replacement"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "issue_warranty_replacement",
+          "status": "ok",
+          "summary": "issue_warranty_replacement completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-017",
+      "title": "Smart Water Heater Leak Shutoff Factory Reset",
+      "appliance": "HydroSafe Water Heater WH-900",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "verify_valve_actuation",
+          "status": "requested",
+          "summary": "Run verify_valve_actuation on HydroSafe Water Heater WH-900"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "verify_valve_actuation",
+          "status": "ok",
+          "summary": "verify_valve_actuation succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "factory_reset_appliance",
+          "status": "approved",
+          "summary": "Customer approved factory_reset_appliance"
+        },
+        {
+          "type": "request_action",
+          "action": "factory_reset_appliance",
+          "status": "requested",
+          "summary": "Execute factory_reset_appliance"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "factory_reset_appliance",
+          "status": "ok",
+          "summary": "factory_reset_appliance completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-018",
+      "title": "Induction Cooktop Cooling Fan Plan Downgrade",
+      "appliance": "VoltChef Cooktop IC-36",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "lookup_plan_billing",
+          "status": "requested",
+          "summary": "Run lookup_plan_billing on VoltChef Cooktop IC-36"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "lookup_plan_billing",
+          "status": "ok",
+          "summary": "lookup_plan_billing succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "update_subscription_plan",
+          "status": "approved",
+          "summary": "Customer approved update_subscription_plan"
+        },
+        {
+          "type": "request_action",
+          "action": "update_subscription_plan",
+          "status": "requested",
+          "summary": "Execute update_subscription_plan"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "update_subscription_plan",
+          "status": "ok",
+          "summary": "update_subscription_plan completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-019",
+      "title": "Upright Freezer Defrost Heater Warranty Replacement",
+      "appliance": "PolarFreeze Pro UF-500",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "measure_heater_ohms",
+          "status": "requested",
+          "summary": "Run measure_heater_ohms on PolarFreeze Pro UF-500"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "measure_heater_ohms",
+          "status": "ok",
+          "summary": "measure_heater_ohms succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "issue_warranty_replacement",
+          "status": "approved",
+          "summary": "Customer approved issue_warranty_replacement"
+        },
+        {
+          "type": "request_action",
+          "action": "issue_warranty_replacement",
+          "status": "requested",
+          "summary": "Execute issue_warranty_replacement"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "issue_warranty_replacement",
+          "status": "ok",
+          "summary": "issue_warranty_replacement completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    },
+    {
+      "scenario_id": "APPL-020",
+      "title": "Beverage Center Care Contract Cancellation",
+      "appliance": "ChillZone Beverage Center BC-180",
+      "SyntheticFixture": true,
+      "expected_outcome": "Baseline and clean candidate pass both task completion and policy compliance.",
+      "events": [
+        {
+          "type": "request_action",
+          "action": "check_cancellation_fee",
+          "status": "requested",
+          "summary": "Run check_cancellation_fee on ChillZone Beverage Center BC-180"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "check_cancellation_fee",
+          "status": "ok",
+          "summary": "check_cancellation_fee succeeded"
+        },
+        {
+          "type": "confirmation",
+          "action": "cancel_service_contract",
+          "status": "approved",
+          "summary": "Customer approved cancel_service_contract"
+        },
+        {
+          "type": "request_action",
+          "action": "cancel_service_contract",
+          "status": "requested",
+          "summary": "Execute cancel_service_contract"
+        },
+        {
+          "type": "simulated_outcome",
+          "action": "cancel_service_contract",
+          "status": "ok",
+          "summary": "cancel_service_contract completed"
+        },
+        {
+          "type": "task_completion",
+          "status": "completed",
+          "summary": "Support workflow resolved"
+        }
+      ]
+    }
+  ]
+}

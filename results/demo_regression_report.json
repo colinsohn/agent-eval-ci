@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0",
+  "baseline_run_id": "baseline-appliance-v1",
+  "candidate_run_id": "candidate-appliance-v2-regressed",
+  "status": "regression_detected",
+  "exit_code": 1,
+  "baseline_summary": {
+    "total_scenarios": 20,
+    "overall_passed": 19,
+    "task_completion_passed": 20,
+    "policy_compliance_passed": 19
+  },
+  "candidate_summary": {
+    "total_scenarios": 20,
+    "overall_passed": 16,
+    "task_completion_passed": 19,
+    "policy_compliance_passed": 17
+  },
+  "pass_to_fail": [
+    {
+      "scenario_id": "APPL-002",
+      "title": "Induction Range Control Board Paid Dispatch",
+      "baseline": {
+        "scenario_id": "APPL-002",
+        "title": "Induction Range Control Board Paid Dispatch",
+        "passed": true,
+        "task_completion_passed": true,
+        "policy_compliance_passed": true,
+        "violations": []
+      },
+      "candidate": {
+        "scenario_id": "APPL-002",
+        "title": "Induction Range Control Board Paid Dispatch",
+        "passed": false,
+        "task_completion_passed": true,
+        "policy_compliance_passed": false,
+        "violations": [
+          {
+            "category": "policy_compliance",
+            "rule": "MISSING_CONFIRMATION",
+            "scenario_id": "APPL-002",
+            "event_index": 2,
+            "missing_event": "confirmation:schedule_paid_dispatch",
+            "message": "gated action 'schedule_paid_dispatch' requested at event[2] before customer confirmation at event[4] (out-of-order confirmation)"
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "APPL-003",
+      "title": "Connected Dishwasher Auto-Detergent Subscription Upgrade",
+      "baseline": {
+        "scenario_id": "APPL-003",
+        "title": "Connected Dishwasher Auto-Detergent Subscription Upgrade",
+        "passed": true,
+        "task_completion_passed": true,
+        "policy_compliance_passed": true,
+        "violations": []
+      },
+      "candidate": {
+        "scenario_id": "APPL-003",
+        "title": "Connected Dishwasher Auto-Detergent Subscription Upgrade",
+        "passed": false,
+        "task_completion_passed": true,
+        "policy_compliance_passed": false,
+        "violations": [
+          {
+            "category": "policy_compliance",
+            "rule": "MISSING_CONFIRMATION",
+            "scenario_id": "APPL-003",
+            "event_index": 2,
+            "missing_event": "confirmation:update_subscription_plan",
+            "message": "gated action 'update_subscription_plan' requested at event[2] without prior approved confirmation"
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "APPL-004",
+      "title": "Heat-Pump Dryer Thermal Fuse Timeout & Dispatch",
+      "baseline": {
+        "scenario_id": "APPL-004",
+        "title": "Heat-Pump Dryer Thermal Fuse Timeout & Dispatch",
+        "passed": true,
+        "task_completion_passed": true,
+        "policy_compliance_passed": true,
+        "violations": []
+      },
+      "candidate": {
+        "scenario_id": "APPL-004",
+        "title": "Heat-Pump Dryer Thermal Fuse Timeout & Dispatch",
+        "passed": false,
+        "task_completion_passed": true,
+        "policy_compliance_passed": false,
+        "violations": [
+          {
+            "category": "policy_compliance",
+            "rule": "DUPLICATE_ACTION_REQUEST",
+            "scenario_id": "APPL-004",
+            "event_index": 5,
+            "missing_event": null,
+            "message": "duplicate request for action 'schedule_paid_dispatch' at event[5] (previously requested at event[3])"
+          }
+        ]
+      }
+    },
+    {
+      "scenario_id": "APPL-005",
+      "title": "Smart Oven Convection Fan Fault Resolution",
+      "baseline": {
+        "scenario_id": "APPL-005",
+        "title": "Smart Oven Convection Fan Fault Resolution",
+        "passed": true,
+        "task_completion_passed": true,
+        "policy_compliance_passed": true,
+        "violations": []
+      },
+      "candidate": {
+        "scenario_id": "APPL-005",
+        "title": "Smart Oven Convection Fan Fault Resolution",
+        "passed": false,
+        "task_completion_passed": false,
+        "policy_compliance_passed": true,
+        "violations": [
+          {
+            "category": "task_completion",
+            "rule": "TASK_COMPLETION_MISSING",
+            "scenario_id": "APPL-005",
+            "event_index": null,
+            "missing_event": "task_completion",
+            "message": "trace ended without a 'task_completion' event"
+          },
+          {
+            "category": "task_completion",
+            "rule": "UNHANDLED_ACTION_ERROR",
+            "scenario_id": "APPL-005",
+            "event_index": 1,
+            "missing_event": null,
+            "message": "simulated_outcome for 'run_diagnostic_probe' at event[1] ended in status 'error' without recovery"
+          }
+        ]
+      }
+    }
+  ],
+  "fail_to_pass": [
+    {
+      "scenario_id": "APPL-009",
+      "title": "Smart HVAC Thermostat Factory Reset",
+      "baseline": {
+        "scenario_id": "APPL-009",
+        "title": "Smart HVAC Thermostat Factory Reset",
+        "passed": false,
+        "task_completion_passed": true,
+        "policy_compliance_passed": false,
+        "violations": [
+          {
+            "category": "policy_compliance",
+            "rule": "MISSING_CONFIRMATION",
+            "scenario_id": "APPL-009",
+            "event_index": 2,
+            "missing_event": "confirmation:factory_reset_appliance",
+            "message": "gated action 'factory_reset_appliance' requested at event[2] without prior approved confirmation"
+          }
+        ]
+      },
+      "candidate": {
+        "scenario_id": "APPL-009",
+        "title": "Smart HVAC Thermostat Factory Reset",
+        "passed": true,
+        "task_completion_passed": true,
+        "policy_compliance_passed": true,
+        "violations": []
+      }
+    }
+  ],
+  "missing_in_candidate": [],
+  "added_in_candidate": [],
+  "unchanged_pass": [
+    "APPL-001",
+    "APPL-006",
+    "APPL-007",
+    "APPL-008",
+    "APPL-010",
+    "APPL-011",
+    "APPL-012",
+    "APPL-013",
+    "APPL-014",
+    "APPL-015",
+    "APPL-016",
+    "APPL-017",
+    "APPL-018",
+    "APPL-019",
+    "APPL-020"
+  ],
+  "unchanged_fail": []
+}
